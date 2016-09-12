@@ -1,1 +1,96 @@
-<!--TODO inverted index view goes here-->
+<!DOCTYPE html>
+<html ng-app = "InvertedIndexApp">
+  <head>
+    <meta charset="utf-8">
+    <title>Inverted index test app</title>
+
+    <!--Reverse index module-->
+    <script type="text/javascript" src="API/src/invertedIndex.js"></script>
+
+    <!--Loads anguar app-->
+    <script type="text/javascript" src="app/ng_modules/angular.min.js"></script>
+
+    <!--Loads custom angularjs app-->
+    <script type="text/javascript" src="app/custom/app.js"></script>
+
+    <!--Loads bootstrap-->
+    <link href="css/bootstrap.css" rel="stylesheet">
+
+    <!--Loads font awesome-->
+    <link href="css/font-awesome.css" rel="stylesheet">
+
+  </head>
+  <body ng-controller="appController">
+     <div class="col-sm-6" style="margin-top:1em;">
+       <div class="col-xs-12" style="height:3em; margin-bottom:1em;padding:0">
+         <input type="file"  name="file" id="file" ng-model="file" file-select="json" file-loaded="notifyLoad()" file-error="myError($error)" ng-hide="true">
+         <label for="file" class="btn btn-primary" style="height:3em; border-radius:0">
+           <i class="icon fa fa-file"></i>
+            Select a file
+         </label>
+
+         <button class="btn btn-secondary pull-right" ng-click="toggleSearchAll()">
+           <i class="icon fa fa{{searchAll?'-check':''}}-square-o"></i>
+           Search All Files
+         </button>
+
+       </div>
+
+       <div class="col-xs-12" style="overflow:auto;height:40em;padding:.5em;background-color:#EFEFEF">
+         <div class="card" ng-repeat="(file, docs) in invertedIndexMap">
+            <div class="card-block" style="border-bottom:3px solid #ccc">
+              <h4 class="card-title" >
+                <a ng-click="docs.visible = !docs.visible" style="cursor:pointer">{{file}}</a>
+                <button class="btn btn-sm btn-secondasy pull-right" name="button" style=""
+                    ng-click="buildIndex(file)"
+                    ng-hide="docs.size">create index</button>
+                 <span class="pull-right" style="cursor:pointer" ng-click="addFile(file , docs)">
+                   <i class="icon fa fa{{searchSpace[file]?'-check':''}}-square-o" ng-show="docs.size"></i>
+                 </span>
+              </h4>
+            </div>
+            <div class="card-block" ng-show="docs.visible && docs.size" style="background-color:#fff;padding:0">
+              <table class="table table-striped">
+                <thead>
+                  <th>Term</th>
+                  <th ng-repeat="id in docs.size">DOC {{id}}</th>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="(term,sources) in docs.index">
+                    <td>{{term}}</td>
+                    <td ng-repeat="id in docs.size">
+                      <span ng-if="sources[id]"><i class="icon fa fa-asterisk"></i></span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+       </div>
+     </div>
+
+     <div class="col-sm-6" style="margin-top:1em;">
+       <div class="col-xs-12" style="height:3em; margin-bottom:1em;padding:0">
+         <div class="input-group">
+            <input class="form-control input-tag" type="text" list="tags" placeholder="Add a tag" ng-model="searchText" style="border-radius:0;height:3em" >
+            <span ng-click="searchFiles(searchText)" class="input-group-addon btn" style="background-color:#fff; padding-left:1em; padding-right:1em; border-radius:0">
+              <i class="icon fa fa-search"></i>
+            </span>
+         </div>
+       </div>
+
+       <div class="col-xs-12" style="background-color:#EFEFEF">
+         <div style="height:40em; padding:.5em;overflow:auto;position:relative;" class="col-xs-12">
+           <div class="card" ng-repeat="doc in results | orderBy:'-score'">
+            <div class="card-block">
+              <h4 class="card-title">{{doc.source.title}}</h4>
+              <h6 class="card-text">{{doc.source.text}}</h6>
+            </div>
+          </div>
+         </div>
+       </div>
+
+     </div>
+
+  </body>
+</html>
