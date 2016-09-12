@@ -31,7 +31,8 @@ gulp.task('browsertestrunner', function() {
     var b1 = browserSync.create();
     b1.init({
       server: {
-          baseDir: './tests',
+          baseDir: './',
+          index : './tests/index.html',
           port: 3040,
           ui: {
               port: 3050
