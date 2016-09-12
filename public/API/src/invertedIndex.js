@@ -127,7 +127,7 @@
                  }
              });
 
-             //After the whole searching is done
+             //After the whole searching is done.
              done(searchResults);
          }
 
