@@ -16,9 +16,11 @@
          * @param {string} dirtyToken
          * @return {string} clean token
          */
-        function _tokenize(dirtyToken) {
-            //@TODO
-        }
+         function _tokenize(dirtyToken) {
+           //Converts the dirtyToken into a normalized form
+           //@TODO add rules for words transformations, sysnonyms and other special cases
+           return dirtyToken.trim().replace(/[^a-z0-9]+/gi, '').toLowerCase();
+         }
 
         /*
          * This method takes in an array of objects in the format {title:'',text:''},
@@ -27,9 +29,51 @@
          * @param {object} file
          * @param {function} done
          */
-        function buildIndex(file, done) {
-            //@TODO
-        }
+         function buildIndex(file, done) {
+               var index = {};
+
+               //Worker function for creating word indeces
+               var indexer = function(tokens, score, doc, id) {
+                   tokens.forEach(function(token) {
+
+                       token = _tokenize(token);
+                       if (index[token]) {
+                           if (index[token][id]) {
+                               index[token][id].score += score;
+                           } else {
+                               index[token][id] = {
+                                   score: score,
+                                   source: doc
+                               };
+                           }
+                       } else {
+                           index[token] = {};
+                           index[token][id] = {
+                               score: score,
+                               source: doc
+                           };
+                       }
+                   });
+               };
+
+               //
+               for (var i = 0; i < file.docs.length; i++) {
+                   var currentDoc = file.docs[i];
+
+                   //index title
+                   var rawTitleTokens = currentDoc.title.split(' ');
+                   indexer(rawTitleTokens, 2, currentDoc, i);
+
+                   //index text
+                   var rawTextTokens = currentDoc.text.split(' ');
+                   indexer(rawTextTokens, 1, currentDoc, i);
+               }
+
+               done(null, {
+                   fileName: file.name,
+                   data: index
+               });
+           }
 
         /*
          * This method takes in a query containing keywords such that when normalized
