@@ -142,6 +142,7 @@
 
         //Public methods accessible by clients of this module
         return {
+            _tokenize: _tokenize,
             buildIndex: buildIndex,
             searchIndex: searchIndex
         };
