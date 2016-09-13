@@ -84,7 +84,7 @@
          * @param {string} query
          * @param {object} indexMap
          * @param {function} done
-         * @return {array} search_results
+         * @return {array} search_results.
          */
          function searchIndex(query, indexMap, done) {
              //
