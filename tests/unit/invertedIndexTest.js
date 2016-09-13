@@ -31,7 +31,7 @@
     ]
   ];
 
-  //Use API fron window global object
+  //Use API from window global object
   console.log(InvertedIndex);
 
   //Test suits to read and analyze files
@@ -81,11 +81,10 @@
       //This checks the docs associated with  all key indices in the indexMap
       //and ensure that all docs contains a token (s) that is equal to the corresponding
       //key they are mapped to.
-       Object.keys(indexMap).forEach(function(fileName) {
-         Object.keys(indexMap[fileName].data).forEach(function(key) {
-           Object.keys(indexMap[fileName].data[key]).forEach(function(docId) {
+       Object.keys(indexMap).forEach(function(fileName) {//search all files
+         Object.keys(indexMap[fileName].data).forEach(function(key) { //search all indexed keys (tokens or words)
+           Object.keys(indexMap[fileName].data[key]).forEach(function(docId) {//search all docs that maps to this key
              var doc = indexMap[fileName].data[key][docId].source;
-             var keyInDoc = false;
 
              //Merge the contents of the doc to one long string and create an
              //array of tokenized terms
@@ -131,16 +130,80 @@
     });
   });
 
-  //Test suits to read and analyze files {}[]
+  //Test suits to read and analyze files
   describe('Search index' , function() {
-    it('Should return an array of documents containing at least a search term', function(){
-      expect(true).toEqual(true);
+    //This holds the indexMap for files
+    var indexMap = {};
+
+    //
+    var file = {
+      name: 'file1',
+      docs: mockFiles[0]
+    };
+
+    InvertedIndex.buildIndex(file , function(err , result) {
+      indexMap[result.fileName] = {
+          index: result.data,
+          size: (function getArr() {
+              arr = [];
+              for (var i = 0; i < file.docs.length; i++) {
+                  arr.push(i);
+              }
+              return arr;
+          })(),
+          visible: true
+      };
     });
+
+    it('Should return an array of documents that has at least a search term in the text or title', function(done){
+      //search for documents that have "hello" or "#TIA" in them  {}[]
+      var query = 'hello #TIA';
+
+      //Converts the query into tokens
+      var queryTokens = query.split(' ').map(function(token) {
+        return InvertedIndex._tokenize(token);
+      });
+
+      InvertedIndex.searchIndex(query , indexMap , function(results) {
+        //checks to make sure that the results returned have at least a keyword in them
+        results.forEach(function(doc) {
+
+          //Merge the contents of the doc to one long string and create an
+          //array of tokenized terms
+          var mergedContentTokens  = (doc.source.title+' '+doc.source.text).split(' ').map(function(token) {
+            return InvertedIndex._tokenize(token);
+          });
+
+          //check if any of the queryTokens exists in mergedContentTokens
+          var tokenExists = false;
+          queryTokens.forEach(function(token) {
+            if(mergedContentTokens.indexOf(token)>=0) {
+              tokenExists = true;
+            }
+          });
+
+          //Asserts that token actually exists
+          expect(tokenExists).toBeTruthy();
+
+          //
+          done();
+        });
+      });
+    });
+
     it('Should handle varied number of search terms', function(){
-      expect(true).toEqual(true);
+      //expect(true).toEqual(true);
     });
+
     it('Should handle an array of search terms', function(){
-      expect(true).toEqual(true);
+      //search for documents that have "hello" or "#TIA" in them
+      var query = 'hello #TIA';
+
+      //Instead of passing a string query into searchIndex method, we pass it an
+      //array of search terms or tkens
+      InvertedIndex.searchIndex(query.split(' ') , indexMap , function(results) {
+          expect(results.length>0).toBeTruthy();
+      });
     });
   });
 
