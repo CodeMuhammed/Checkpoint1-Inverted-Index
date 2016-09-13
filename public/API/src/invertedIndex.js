@@ -92,16 +92,6 @@
              var fileNames = Object.keys(indexMap);
              var usedTokens = [];
 
-             //This function checks the list of results for a given doc to see if it has already been added
-             var resultExists = function(doc) {
-                 for (var i = 0; i < searchResults.length; i++) {
-                     if (searchResults[i].source.title === doc.source.title && searchResults[i].source.text === doc.source.text) {
-                         return true;
-                     }
-                 }
-                 return false;
-             };
-
              //Generate tokens from query
              var rawTokens;
              if(typeof query === 'string') {
@@ -111,11 +101,20 @@
                rawTokens = query;
              }
 
+             //This function checks the list of results for a given doc to see if it has already been added
+             var resultExists = function(doc) {
+                 var docIndexInResult = -1
+                 for (var i = 0; i < searchResults.length; i++) {
+                     if (searchResults[i].source.title === doc.source.title && searchResults[i].source.text === doc.source.text) {
+                         return i;
+                     }
+                 }
+                 return docIndexInResult;
+             };
+
              //
              rawTokens.forEach(function(token) {
                  token = _tokenize(token);
-
-                 //
                  if (usedTokens.indexOf(token) < 0) {
                      //Search through every file in the map
                      fileNames.forEach(function(name) {
@@ -124,8 +123,13 @@
                              Object.keys(indexMap[name].index[token]).forEach(function(id) {
                                  //Make sure to add unique doc only in result
                                  var doc = indexMap[name].index[token][id];
-                                 if (!resultExists(doc)) {
+                                 var existsInResult = resultExists(doc);
+                                 if (existsInResult < 0) {
                                      searchResults.push(doc);
+                                 }
+                                 //update the score for that particular document
+                                 else {
+                                   searchResults[existsInResult].score+=doc.score;
                                  }
                              });
                          }
@@ -135,8 +139,9 @@
                      usedTokens.push(token);
                  }
              });
-             //
-             //After the whole searching is done.
+
+
+             //Return results after the whole searching is done.
              done(searchResults);
          }
 

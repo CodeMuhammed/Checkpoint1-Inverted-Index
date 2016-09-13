@@ -159,11 +159,6 @@
       //search for documents that have "hello" or "#TIA" in them  {}[]
       var query = 'hello #TIA';
 
-      //Converts the query into tokens
-      var queryTokens = query.split(' ').map(function(token) {
-        return InvertedIndex._tokenize(token);
-      });
-
       InvertedIndex.searchIndex(query , indexMap , function(results) {
         //checks to make sure that the results returned have at least a keyword in them
         results.forEach(function(doc) {
@@ -176,8 +171,8 @@
 
           //check if any of the queryTokens exists in mergedContentTokens
           var tokenExists = false;
-          queryTokens.forEach(function(token) {
-            if(mergedContentTokens.indexOf(token)>=0) {
+          query.split(' ').forEach(function(token) {
+            if(mergedContentTokens.indexOf(InvertedIndex._tokenize(token))>=0) {
               tokenExists = true;
             }
           });
