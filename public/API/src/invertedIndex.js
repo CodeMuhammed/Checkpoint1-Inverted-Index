@@ -90,7 +90,7 @@
              //
              var searchResults = [];
              var fileNames = Object.keys(indexMap);
-             var tokens = [];
+             var usedTokens = [];
 
              //This function checks the list of results for a given doc to see if it has already been added
              var resultExists = function(doc) {
@@ -103,11 +103,20 @@
              };
 
              //Generate tokens from query
-             query.split(' ').forEach(function(token) {
+             var rawTokens;
+             if(typeof query === 'string') {
+               rawTokens = query.split(' ');
+             }
+             else if(query[0]) {
+               rawTokens = query;
+             }
+
+             //
+             rawTokens.forEach(function(token) {
                  token = _tokenize(token);
 
                  //
-                 if (tokens.indexOf(token) < 0) {
+                 if (usedTokens.indexOf(token) < 0) {
                      //Search through every file in the map
                      fileNames.forEach(function(name) {
                          //Iterate through id of documemts
@@ -123,7 +132,7 @@
                      });
 
                      //Record used tokens
-                     tokens.push(token);
+                     usedTokens.push(token);
                  }
              });
              //
