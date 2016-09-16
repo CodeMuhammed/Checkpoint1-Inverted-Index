@@ -156,7 +156,7 @@
     });
 
     it('Should return an array of documents that has at least a search term in the text or title', function(done){
-      //search for documents that have "hello" or "#TIA" in them  {}[]
+      //search for documents that have "hello" or "#TIA" in them
       var query = 'hello #TIA';
 
       InvertedIndex.searchIndex(query , indexMap , function(results) {

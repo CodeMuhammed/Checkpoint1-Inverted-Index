@@ -103,7 +103,7 @@
 
              //This function checks the list of results for a given doc to see if it has already been added
              var resultExists = function(doc) {
-                 var docIndexInResult = -1
+                 var docIndexInResult = -1;
                  for (var i = 0; i < searchResults.length; i++) {
                      if (searchResults[i].source.title === doc.source.title && searchResults[i].source.text === doc.source.text) {
                          return i;
