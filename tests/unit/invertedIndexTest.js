@@ -162,7 +162,7 @@
                   arr.push(i);
               }
               return arr;
-          })(),
+          }()),
           visible: true
       };
     });
