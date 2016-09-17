@@ -9,4 +9,6 @@ engines:
       languages:
       - javascript
 exclude_paths:
-- node_modules
+- *.*
+- !public/API/**/*.js
+- !tests/unit/**/*.js
