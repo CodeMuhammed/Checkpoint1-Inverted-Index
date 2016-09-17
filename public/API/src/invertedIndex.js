@@ -18,7 +18,6 @@
          */
          function _tokenize(dirtyToken) {
            //Converts the dirtyToken into a normalized form
-           //@TODO add rules for words transformations, sysnonyms and other special cases
            return dirtyToken.trim().replace(/[^a-z0-9]+/gi, '').toLowerCase();
          }
 
@@ -89,8 +88,8 @@
          function searchIndex(query, indexMap, done) {
              //
              var searchResults = [];
-             var fileNames = Object.keys(indexMap);
              var usedTokens = [];
+             var fileNames = Object.keys(indexMap);
 
              //Generate tokens from query
              var rawTokens;
@@ -152,4 +151,4 @@
             searchIndex: searchIndex
         };
     });
-})();
+}());

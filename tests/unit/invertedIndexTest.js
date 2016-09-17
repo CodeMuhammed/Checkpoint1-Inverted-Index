@@ -70,6 +70,9 @@
       };
 
       InvertedIndex.buildIndex(file , function(err , index) {
+        if(err) {
+          throw new Error('Invalid file');
+        }
         indexMap[index.fileName] = index;
         expect(index.fileName === 'file1').toBeTruthy();
         expect(Object.keys(index.data).length>0).toBeTruthy();
@@ -115,12 +118,18 @@
 
       //Index the first file
       InvertedIndex.buildIndex(file1 , function(err , index) {
+        if(err) {
+          throw new Error('Invalid file');
+        }
         indexMap[index.fileName] = index;
         //asserts that only one file was indexed
         expect(Object.keys(indexMap).length === 1).toBeTruthy();
 
         //Index the second file
         InvertedIndex.buildIndex(file2 , function(err , index) {
+          if(err) {
+            throw new Error('Invalid file');
+          }
           indexMap[index.fileName] = index;
           //asserts that two files are now indexed
           expect(Object.keys(indexMap).length === 2).toBeTruthy();
@@ -142,6 +151,9 @@
     };
 
     InvertedIndex.buildIndex(file , function(err , result) {
+      if(err) {
+         throw new Error('Invalid file');
+      }
       indexMap[result.fileName] = {
           index: result.data,
           size: (function getArr() {
@@ -150,7 +162,7 @@
                   arr.push(i);
               }
               return arr;
-          })(),
+          }()),
           visible: true
       };
     });
@@ -202,4 +214,4 @@
     });
   });
 
-})();
+}());
