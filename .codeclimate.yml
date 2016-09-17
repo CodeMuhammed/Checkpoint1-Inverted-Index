@@ -9,6 +9,6 @@ engines:
       languages:
       - javascript
 exclude_paths:
-- *.*
-- !public/API/**/*.js
-- !tests/unit/**/*.js
+- "*.*"
+- "!public/API/**/*.js"
+- "!tests/unit/**/*.js"
