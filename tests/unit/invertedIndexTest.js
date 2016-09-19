@@ -2,7 +2,6 @@
 * This function runs the tests for the application files
 */
 (function() {
-
   //This is a mocked out files
   var mockFiles = [
     [
