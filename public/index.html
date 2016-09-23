@@ -39,7 +39,8 @@
        <div class="col-xs-12" style="overflow:auto;height:40em;padding:.5em;background-color:#EFEFEF">
          <div class="card" ng-repeat="(file, docs) in invertedIndexMap">
             <div class="card-block" style="border-bottom:3px solid #ccc">
-              <h4 class="card-title" >
+              <h4 class="card-title" style="">
+                <i class="icon fa fa-caret-{{docs.visible? 'down':'right'}}"></i>
                 <a ng-click="docs.visible = !docs.visible" style="cursor:pointer">{{file}}</a>
                 <button class="btn btn-sm btn-secondasy pull-right" name="button" style=""
                     ng-click="buildIndex(file)"

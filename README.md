@@ -24,6 +24,6 @@ Follow the steps below to run the application locally on your machine.
 
 
 
-##Tesing
+##Testing
 
-The tests are done using jasmine test runner on the root folder, type gulp
+The tests are done using jasmine test runner that reports in the browser
