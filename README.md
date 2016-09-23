@@ -1,6 +1,5 @@
 [![Build Status](https://travis-ci.org/CodeMuhammed/Checkpoint1-Inverted-Index.svg?branch=develop)](https://travis-ci.org/CodeMuhammed/Checkpoint1-Inverted-Index)
-[![Coverage Status](https://coveralls.io/repos/github/CodeMuhammed/Checkpoint1-Inverted-Index/badge.svg?branch=develop)](https://coveralls.io/github/CodeMuhammed/Checkpoint1-Inverted-Index?branch=develop)
-
+[![Coverage Status](https://coveralls.io/repos/github/CodeMuhammed/Checkpoint1-Inverted-Index/badge.svg?branch=ft-coverall)](https://coveralls.io/github/CodeMuhammed/Checkpoint1-Inverted-Index?branch=ft-coverall)
 
 # Checkpoint1-Inverted-Index
 ## Overview
