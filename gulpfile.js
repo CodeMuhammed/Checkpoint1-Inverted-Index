@@ -3,7 +3,7 @@
 */
 var gulp        = require('gulp');
 var browserSync = require('browser-sync');
-var exec = require('child_process').exec;
+var exec        = require('child_process').exec;
 
 // This task runs the browser test runner and then serves the app.
 gulp.task('app' , ['browsertestrunner' , 'serve']);
