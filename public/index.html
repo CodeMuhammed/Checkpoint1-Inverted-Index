@@ -43,7 +43,7 @@
                 <i class="icon fa fa-caret-{{docs.visible? 'down':'right'}}"></i>
                 <a ng-click="docs.visible = !docs.visible" style="cursor:pointer">{{file}}</a>
                 <button class="btn btn-sm btn-secondasy pull-right" name="button" style=""
-                    ng-click="buildIndex(file)"
+                    ng-click="createIndex(file)"
                     ng-hide="docs.size">create index</button>
                  <span class="pull-right" style="cursor:pointer" ng-click="addFile(file , docs)">
                    <i class="icon fa fa{{searchSpace[file]?'-check':''}}-square-o" ng-show="docs.size"></i>
@@ -73,7 +73,7 @@
      <div class="col-sm-6" style="margin-top:1em;">
        <div class="col-xs-12" style="height:3em; margin-bottom:1em;padding:0">
          <div class="input-group">
-            <input class="form-control input-tag" type="text" list="tags" placeholder="Add a tag" ng-model="searchText" style="border-radius:0;height:3em" >
+            <input class="form-control input-tag" type="text" list="tags" placeholder="Search" ng-model="searchText" style="border-radius:0;height:3em" >
             <span ng-click="searchFiles(searchText)" class="input-group-addon btn" style="background-color:#fff; padding-left:1em; padding-right:1em; border-radius:0">
               <i class="icon fa fa-search"></i>
             </span>

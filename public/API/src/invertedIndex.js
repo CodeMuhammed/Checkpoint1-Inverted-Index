@@ -4,14 +4,28 @@
 (function() {
     //This prevents multiple initialzation of the API
     var ensure = function(obj, name, factory) {
-        return obj[name] || (obj[name] = factory());
+        if(obj[name]){
+            throw new Error(name+' Already exists in global space');
+        }
+        else {
+            obj[name] = factory();
+            return;
+        }
     };
+
     //Main logic here
     ensure(window, 'InvertedIndex', function() {
+        //Instance variable to hold the indices.
+        var indexMap = {};
+
+        //
+        var TITLE_SCORE = 2;
+        var TEXT_SCORE = 1;
+
         /*
          * This method takes in a word with whitespaces, non-alphanumric characters and
-         * Returns a clean version with all those unecessary characters striped away
-         * And may sometimes further break tokens down into smaller parts
+         * Returns a clean version with all unecessary characters striped away
+         * And may sometimes further break token down into smaller parts
          *
          * @param {string} dirtyToken
          * @return {string} clean token
@@ -21,108 +35,143 @@
            return dirtyToken.trim().replace(/[^a-z0-9]+/gi, '').toLowerCase();
          }
 
-        /*
-         * This method takes in an array of objects in the format {title:'',text:''},
-         * And creates a searchable index with the words or tokens at each key value.
-         *
-         * @param {object} file
-         * @param {function} done
-         */
-         function buildIndex(file, done) {
-               var index = {};
-
-               //Worker function for creating word indeces
-               var indexer = function(tokens, score, doc, id) {
-                   tokens.forEach(function(token) {
-
-                       token = _tokenize(token);
-                       if (index[token]) {
-                           if (index[token][id]) {
-                               index[token][id].score += score;
-                           } else {
-                               index[token][id] = {
-                                   score: score,
-                                   source: doc
-                               };
-                           }
-                       } else {
-                           index[token] = {};
-                           index[token][id] = {
-                               score: score,
-                               source: doc
-                           };
-                       }
-                   });
-               };
-
-               //
-               for (var i = 0; i < file.docs.length; i++) {
-                   var currentDoc = file.docs[i];
-
-                   //index title
-                   var rawTitleTokens = currentDoc.title.split(' ');
-                   indexer(rawTitleTokens, 2, currentDoc, i);
-
-                   //index text
-                   var rawTextTokens = currentDoc.text.split(' ');
-                   indexer(rawTextTokens, 1, currentDoc, i);
-               }
-
-               done(null, {
-                   fileName: file.name,
-                   data: index
-               });
-           }
 
         /*
-         * This method takes in a query containing keywords such that when normalized
-         * Tallys with the indexed tokens.
-         * Search Results are then aggregated by searching through the wordMapIndex with each tokens
-         * From the query
+         * This
          *
-         * @param {string} query
-         * @param {object} indexMap
-         * @param {function} done
-         * @return {array} search_results.
+         * @
          */
-         function searchIndex(query, indexMap, done) {
+         function createIndex(fileObj) {
+             var message = {
+                 status: false,
+                 text: ''
+             };
+             
+             if(typeof fileObj !== 'object') {
+                 message.text = 'Argument must be an object';
+             }
+             if( (typeof fileObj.name !== 'string' && fileObj.name !=='') || !(Array.isArray(fileObj.docs)) ) {
+                 message.text = 'Invalid argument object: does not contain required properties';
+             }
+             else {
+                 indexMap[fileObj.name] = {
+                     _docSize:fileObj.docs.length
+                 };
+
+                 for(var i=0; i < fileObj.docs.length; i++) {
+                    var currentDoc = fileObj.docs[i];
+
+
+                    //Index only docs that are formatted correctly
+                    if(typeof currentDoc.title === 'string' && typeof currentDoc.text === 'string') {
+                        //index title
+                        var rawTitleTokens = currentDoc.title.split(' ');
+                        indexer(fileObj.name , rawTitleTokens, TITLE_SCORE, currentDoc, i);
+
+                        //index text
+                        var rawTextTokens = currentDoc.text.split(' ');
+                        indexer(fileObj.name , rawTextTokens, TEXT_SCORE , currentDoc, i);
+                    }
+                }
+                
+                if(Object.keys(indexMap[fileObj.name]).length > 1) {
+                    message.status = true;
+                    message.text = 'Index created successfully';
+                }
+                else {
+                    message.text = 'File does not contain any indexable docs';
+                }
+                
+             }
+             
              //
+             return message;
+         }
+
+         /** 
+         * This
+         *
+         * @
+         */
+         function indexer(fileName , tokens, score, doc, id) {
+
+             tokens.forEach(function(token) {
+                token = _tokenize(token);
+                if (indexMap[fileName][token]) {
+                    if (indexMap[fileName][token][id]) {
+                        indexMap[fileName][token][id].score += score;
+                    }
+                    else {
+                        indexMap[fileName][token][id] = {
+                            score: score,
+                            source: doc
+                        };
+                    }
+                } 
+                else {
+                    indexMap[fileName][token] = {};
+                    indexMap[fileName][token][id] = {
+                        score: score,
+                        source: doc
+                    };
+                }
+            });
+         }
+
+        /*
+         * This 
+         *
+         * @
+         * @optional argument
+         */
+         function getIndex(fileName) {
+            if(fileName && typeof fileName === 'string' && indexMap[fileName]) {
+                var obj = {};
+                obj[fileName] = indexMap[fileName];
+
+                return obj;
+            }
+            return indexMap;
+         }
+
+        /*
+         * This
+         * 
+         * @
+         */
+         function searchIndex(query , options) {
              var searchResults = [];
              var usedTokens = [];
              var fileNames = Object.keys(indexMap);
 
-             //Generate tokens from query
              var rawTokens;
+             var message = {
+                 status:false,
+             };
+
              if(typeof query === 'string') {
                rawTokens = query.split(' ');
              }
-             else if(query[0]) {
+             else if(typeof query[0] === 'string') {
                rawTokens = query;
              }
+             else {
+                 message.text = 'Invalid query provided';
+                 return message;
+             }
 
-             //This function checks the list of results for a given doc to see if it has already been added
-             var resultExists = function(doc) {
-                 var docIndexInResult = -1;
-                 for (var i = 0; i < searchResults.length; i++) {
-                     if (searchResults[i].source.title === doc.source.title && searchResults[i].source.text === doc.source.text) {
-                         return i;
-                     }
-                 }
-                 return docIndexInResult;
-             };
-
-             //
+              //
              rawTokens.forEach(function(token) {
                  token = _tokenize(token);
                  if (usedTokens.indexOf(token) < 0) {
                      //Search through every file in the map
                      fileNames.forEach(function(name) {
                          //Iterate through id of documemts
-                         if (indexMap[name].index[token]) {
-                             Object.keys(indexMap[name].index[token]).forEach(function(id) {
+                         if (indexMap[name][token]) {
+                             Object.keys(indexMap[name][token]).forEach(function(id) {
                                  //Make sure to add unique doc only in result
-                                 var doc = indexMap[name].index[token][id];
-                                 var existsInResult = resultExists(doc);
+                                 var doc = indexMap[name][token][id];
+                                 var existsInResult = resultExists(doc , searchResults);
                                  if (existsInResult < 0) {
                                      searchResults.push(doc);
                                  }
@@ -138,17 +187,34 @@
                      usedTokens.push(token);
                  }
              });
+             
+             message.status = true;
+             message.val = searchResults;
+             return message;
+         };
 
-
-             //Return results after the whole searching is done.
-             done(searchResults);
+         /*
+         * This
+         * 
+         * @
+         */
+         function resultExists(results , doc) {
+            var docIndexInResult = -1;
+            for (var i = 0; i < results.length; i++) {
+                if (results[i].source.title === doc.source.title && resultesults[i].source.text === doc.source.text) {
+                    return i;
+                }
+            }
+            return docIndexInResult;
          }
 
         //Public methods accessible by clients of this module
         return {
-            _tokenize: _tokenize,
-            buildIndex: buildIndex,
-            searchIndex: searchIndex
+            createIndex:createIndex,
+            getIndex:getIndex,
+            searchIndex:searchIndex,
+            _tokenize:_tokenize
         };
+        
     });
 }());
