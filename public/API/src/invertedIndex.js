@@ -37,9 +37,10 @@
 
 
         /*
-         * This
+         * This function takes in a fileObject and generates an inverted index for it
          *
-         * @
+         * @param {object} fileObj
+         * @return {obj} message
          */
          function createIndex(fileObj) {
              var message = {
@@ -89,9 +90,14 @@
          }
 
          /** 
-         * This
+         * This methods takes a document and adds its inverted index to the indexMap
          *
-         * @
+         * @param {string} fileName
+         * @param {array} tokens
+         * @param {number} score
+         * @param {object} doc
+         * @param {number} id
+         * 
          */
          function indexer(fileName , tokens, score, doc, id) {
 
@@ -119,10 +125,11 @@
          }
 
         /*
-         * This 
+         * This method returns the inverted index corresponding to the fileName
+         * If a filename is not provided, it returns all the indeces
          *
-         * @
-         * @optional argument
+         * @optional {string} filename
+         * @return {object} invertedIndex
          */
          function getIndex(fileName) {
             if(fileName && typeof fileName === 'string' && indexMap[fileName]) {
@@ -135,9 +142,10 @@
          }
 
         /*
-         * This
+         * This mwthods searches through the inverted index for docs that matches the query
          * 
-         * @
+         * @param {string / array} query
+         * @return {array} searchResults
          */
          function searchIndex(query , options) {
              var searchResults = [];
@@ -194,9 +202,10 @@
          };
 
          /*
-         * This
+         * This methods prevents search results from having duplicates
          * 
-         * @
+         * @param {array} results
+         * @return {object} doc
          */
          function resultExists(results , doc) {
             var docIndexInResult = -1;
