@@ -160,7 +160,7 @@
 
         expect(stopTime-startTime < MAX_TIME).toBeTruthy();
 
-      });
+      });//
 
       it('Ensure searchIndex can handle an array of search terms' , function() {
         var result = InvertedIndex.searchIndex(query.split(' ') , 'file1');
