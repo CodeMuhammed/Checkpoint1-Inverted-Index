@@ -2,6 +2,7 @@
 * This function runs the tests for the application files
 */
 (function() {
+  
   //This is a mocked out files
   var mockFiles = [
     [
@@ -29,188 +30,144 @@
       }
     ]
   ];
+  
+  describe('Tests for Inverted-index API' , function() {
 
-  //Use API from window global object
-  console.log(InvertedIndex);
-
-  //Test suits to read and analyze files
-  describe('Read book data' , function() {
-    it('Should assert that the files are not empty', function(){
-      mockFiles.forEach(function(file) {
-        expect(file.length>0).toBeTruthy();
-      });
+    describe('Read book data' , function() {
+       //can't really test this suite'
     });
 
-    it('Makes sure that all properties of each object in a file is a string', function(){
-      mockFiles.forEach(function(file) {
-        file.forEach(function(doc) {
-          expect(typeof doc.title === 'string').toBeTruthy();
-          expect(typeof doc.text === 'string').toBeTruthy();
+    describe('Populate Index' , function() {
+      var indexMap; 
+
+      //Reset indexMap before each run of this suite.
+      beforeAll(function() {
+        indexMap = {};
+      });
+
+      it('Maps the string keys to the correct objects in the JSON array', function() {
+        InvertedIndex.createIndex({
+          name: 'file1',
+          docs: mockFiles[0]
+        }); 
+
+        indexMap = InvertedIndex.getIndex('file1')['file1'];
+        delete(indexMap._docSize);
+
+        //This checks the docs associated with  all key indices in the indexMap
+        //and ensure that all docs contains a token (s) that is equal to the corresponding
+        //key they are mapped to.
+        Object.keys(indexMap).forEach(function(key) { //search all indexed keys (tokens or words)
+          Object.keys(indexMap[key]).forEach(function(docId) {//search all docs that maps to this key
+            var doc = indexMap[key][docId].source;
+
+            //Merge the contents of the doc to one long string and create an
+            //array of tokenized terms
+            var mergedContentTokens  = (doc.title+' '+doc.text).split(' ').map(function(token) {
+              return InvertedIndex._tokenize(token);
+            });
+
+            //check mergedContentTokens to see if key exists
+            expect(mergedContentTokens.indexOf(key) >= 0).toBeTruthy();
+          });
         });
+        
       });
-    });
-  });
 
-  //Test suits populates the indexMap
-  describe('Populate index' , function() {
-    //This holds the indexMap for files
-    var indexMap = {};
-
-    //Reset indexMap before each run of this suite.
-    beforeAll(function() {
-      indexMap = {};
-    });
-
-    it('Should create an index map', function(done){
-      //
-      var file = {
-        name: 'file1',
-        docs: mockFiles[0]
-      };
-
-      InvertedIndex.buildIndex(file , function(err , index) {
-        if(err) {
-          throw new Error('Invalid file');
-        }
-        indexMap[index.fileName] = index;
-        expect(index.fileName === 'file1').toBeTruthy();
-        expect(Object.keys(index.data).length>0).toBeTruthy();
-        done();
-      });
-    });
-
-    it('Should map the string keys to the correct objects in indexMap', function(){
-      //This checks the docs associated with  all key indices in the indexMap
-      //and ensure that all docs contains a token (s) that is equal to the corresponding
-      //key they are mapped to.
-       Object.keys(indexMap).forEach(function(fileName) {//search all files
-         Object.keys(indexMap[fileName].data).forEach(function(key) { //search all indexed keys (tokens or words)
-           Object.keys(indexMap[fileName].data[key]).forEach(function(docId) {//search all docs that maps to this key
-             var doc = indexMap[fileName].data[key][docId].source;
-
-             //Merge the contents of the doc to one long string and create an
-             //array of tokenized terms
-             var mergedContentTokens  = (doc.title+' '+doc.text).split(' ').map(function(token) {
-               return InvertedIndex._tokenize(token);
-             });
-
-             //check mergedContentTokens to see if key exists
-             expect(mergedContentTokens.indexOf(key)>=0).toBeTruthy();
-           });
+      it('Ensures index is not overwritten by a new JSON file' , function() {
+         //Index a file
+         InvertedIndex.createIndex({
+            name: 'file1',
+            docs: mockFiles[0]
          });
-       });
+
+         //Check if the lenght is 1
+         expect(Object.keys(InvertedIndex.getIndex('file1')).length === 1).toBeTruthy();
+
+         //Index another file
+         InvertedIndex.createIndex({
+            name: 'file2',
+            docs: mockFiles[1]
+         });
+
+         //Check if the length of the indexed files is now 2
+         expect(Object.keys(InvertedIndex.getIndex()).length === 2).toBeTruthy();
+         
+      })
 
     });
 
-    it('Should not override index when a new file is indexed', function(done){
-      //
-      var file1 = {
+    //Test suits populates the index and makes sure it's in the  desired state'
+    describe('Get Index' , function() {
+      InvertedIndex.createIndex({
         name: 'file1',
         docs: mockFiles[0]
-      };
-
-      //
-      var file2 = {
-        name: 'file2',
-        docs: mockFiles[1]
-      };
-
-      //Index the first file
-      InvertedIndex.buildIndex(file1 , function(err , index) {
-        if(err) {
-          throw new Error('Invalid file');
-        }
-        indexMap[index.fileName] = index;
-        //asserts that only one file was indexed
-        expect(Object.keys(indexMap).length === 1).toBeTruthy();
-
-        //Index the second file
-        InvertedIndex.buildIndex(file2 , function(err , index) {
-          if(err) {
-            throw new Error('Invalid file');
-          }
-          indexMap[index.fileName] = index;
-          //asserts that two files are now indexed
-          expect(Object.keys(indexMap).length === 2).toBeTruthy();
-          done();
-        });
       });
-    });
-  });
 
-  //Test suits to read and analyze files
-  describe('Search index' , function() {
-    //This holds the indexMap for files
-    var indexMap = {};
-
-    //
-    var file = {
-      name: 'file1',
-      docs: mockFiles[0]
-    };
-
-    InvertedIndex.buildIndex(file , function(err , result) {
-      if(err) {
-         throw new Error('Invalid file');
-      }
-      indexMap[result.fileName] = {
-          index: result.data,
-          size: (function getArr() {
-              arr = [];
-              for (var i = 0; i < file.docs.length; i++) {
-                  arr.push(i);
-              }
-              return arr;
-          }()),
-          visible: true
-      };
+      it('Ensures getIndex returns the correct index', function() {
+        expect(typeof InvertedIndex.getIndex('file1')['file1'] === 'object').toBeTruthy();
+      });
+      
     });
 
-    it('Should return an array of documents that has at least a search term in the text or title', function(done){
-      //search for documents that have "hello" or "#TIA" in them
-      var query = 'hello #TIA';
+    //Test suits populates the index and makes sure it's in the  desired state'
+    describe('Search Index' , function() {
+      //Index a file
+      InvertedIndex.createIndex({
+        name: 'file1',
+        docs: mockFiles[0]
+      });
 
-      InvertedIndex.searchIndex(query , indexMap , function(results) {
-        //checks to make sure that the results returned have at least a keyword in them
-        results.forEach(function(doc) {
+      var query = 'Hello #TIA';
 
-          //Merge the contents of the doc to one long string and create an
-          //array of tokenized terms
-          var mergedContentTokens  = (doc.source.title+' '+doc.source.text).split(' ').map(function(token) {
-            return InvertedIndex._tokenize(token);
+      it('verifies that searching the index returns correct values', function(){
+        var results = InvertedIndex.searchIndex(query , 'file1');
+        var mergedContentTokens;
+        //
+        query.split(' ').forEach(function(word) {
+          word = InvertedIndex._tokenize(word);
+
+          results.val.forEach(function(result){
+                mergedContentTokens  = (result.source.title+' '+result.source.text).split(' ').map(function(token) {
+                return InvertedIndex._tokenize(token);
+              });  
           });
-
-          //check if any of the queryTokens exists in mergedContentTokens
-          var tokenExists = false;
-          query.split(' ').forEach(function(token) {
-            if(mergedContentTokens.indexOf(InvertedIndex._tokenize(token))>=0) {
-              tokenExists = true;
-            }
-          });
-
-          //Asserts that token actually exists
-          expect(tokenExists).toBeTruthy();
-
-          //
-          done();
+          
+          expect(mergedContentTokens.indexOf(word) >=0).toBeTruthy();
         });
+
+        
       });
-    });
 
-    it('Should handle varied number of search terms', function(){
-      //expect(true).toEqual(true);
-    });
+      it('Ensures search does not take too long to execute', function() {
+        var MAX_TIME = 500; //milliseconds
+        var query = 'Hello #TIA';
+        var starTime;
+        var stopTime;
 
-    it('Should handle an array of search terms', function(){
-      //search for documents that have "hello" or "#TIA" in them
-      var query = 'hello #TIA';
+        InvertedIndex.createIndex({
+          name: 'file1',
+          docs: mockFiles[0]
+        });
 
-      //Instead of passing a string query into searchIndex method, we pass it an
-      //array of search terms or tkens
-      InvertedIndex.searchIndex(query.split(' ') , indexMap , function(results) {
-          expect(results.length>0).toBeTruthy();
+        //Search files here
+        startTime = Date.now();
+
+        var result = InvertedIndex.searchIndex(query.split(' ') , 'file1');
+        expect(result.status).toBeTruthy();
+
+        stopTime = Date.now();
+
+        expect(stopTime-startTime < MAX_TIME).toBeTruthy();
+
       });
+
+      it('Ensure searchIndex can handle an array of search terms' , function() {
+        var result = InvertedIndex.searchIndex(query.split(' ') , 'file1');
+        expect(result.status).toBeTruthy();
+      });
+
     });
+
   });
-
 }());
