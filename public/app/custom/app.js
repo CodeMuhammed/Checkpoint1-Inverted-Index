@@ -51,8 +51,9 @@ angular.module('InvertedIndexApp', [])
         $scope.invertedIndexMap = {};
         $scope.searchSpace = {};
 
-        //This function is called whenever the file selector directive has successfully read and updated
-        //the value of a new file on this scope with the data just read
+        /*This function is called whenever the file selector directive 
+        *has successfully read and updated
+        *the value of a new file on this scope with the data just read*/
         $scope.notifyLoad = function () {
             $timeout(function () {
                 $scope.invertedIndexMap[$scope.file.name] = angular.copy($scope.file);
@@ -82,28 +83,25 @@ angular.module('InvertedIndexApp', [])
                     };
 
                 });
-            }
-            else {
+            } else {
                 alert(message.text);
             }
         };
 
-        //This function uses the search method in the InvertedIndex API to get Results
-        //Based on the keywords entered by user
+        /*This function uses the search method in the InvertedIndex API to get Results
+         *Based on the keywords entered by user*/
         $scope.searchFiles = function (query) {
             if (query && query.length > 0 && Object.keys($scope.searchSpace).length > 0) {
                 $timeout(function () {
                     var snapshot = InvertedIndex.searchIndex(query, Object.keys($scope.searchSpace));
                     if (snapshot.status) {
                         $scope.results = snapshot.val;
-                    }
-                    else {
+                    } else {
                         alert(snapshot.text);
                     }
 
                 });
-            }
-            else {
+            } else {
                 alert('Please add a file or enter a search query');
             }
         };
@@ -113,8 +111,7 @@ angular.module('InvertedIndexApp', [])
         $scope.toggleSearchAll = function () {
             if ($scope.searchAll) {
                 $scope.searchSpace = {};
-            }
-            else {
+            } else {
                 $scope.searchSpace = angular.copy($scope.invertedIndexMap);
             }
 
@@ -126,8 +123,7 @@ angular.module('InvertedIndexApp', [])
             $scope.searchAll = false;
             if ($scope.searchSpace[fileName]) {
                 delete $scope.searchSpace[fileName];
-            }
-            else {
+            } else {
                 $scope.searchSpace[fileName] = docs;
             }
         };
