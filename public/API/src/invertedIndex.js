@@ -6,8 +6,7 @@
     var ensure = function (obj, name, factory) {
         if (obj[name]) {
             throw new Error(name + ' Already exists in global space');
-        }
-        else {
+        } else {
             obj[name] = factory();
             return;
         }
@@ -51,10 +50,10 @@
             if (typeof fileObj !== 'object') {
                 message.text = 'Argument must be an object';
             }
+            
             if ((typeof fileObj.name !== 'string' && fileObj.name !== '') || !(Array.isArray(fileObj.docs))) {
                 message.text = 'Invalid argument object: does not contain required properties';
-            }
-            else {
+            } else {
                 indexMap[fileObj.name] = {
                     _docSize: fileObj.docs.length
                 };
@@ -78,8 +77,7 @@
                 if (Object.keys(indexMap[fileObj.name]).length > 1) {
                     message.status = true;
                     message.text = 'Index created successfully';
-                }
-                else {
+                } else {
                     message.text = 'File does not contain any indexable docs';
                 }
 
@@ -106,15 +104,13 @@
                 if (indexMap[fileName][token]) {
                     if (indexMap[fileName][token][id]) {
                         indexMap[fileName][token][id].score += score;
-                    }
-                    else {
+                    } else {
                         indexMap[fileName][token][id] = {
                             score: score,
                             source: doc
                         };
                     }
-                }
-                else {
+                } else {
                     indexMap[fileName][token] = {};
                     indexMap[fileName][token][id] = {
                         score: score,
@@ -159,11 +155,9 @@
 
             if (typeof query === 'string') {
                 rawTokens = query.split(' ');
-            }
-            else if (typeof query[0] === 'string') {
+            } else if (typeof query[0] === 'string') {
                 rawTokens = query;
-            }
-            else {
+            } else {
                 message.text = 'Invalid query provided';
                 return message;
             }
@@ -182,9 +176,7 @@
                                 var existsInResult = resultExists(doc, searchResults);
                                 if (existsInResult < 0) {
                                     searchResults.push(doc);
-                                }
-                                //update the score for that particular document
-                                else {
+                                } else { //update the score for that particular document
                                     searchResults[existsInResult].score += doc.score;
                                 }
                             });
