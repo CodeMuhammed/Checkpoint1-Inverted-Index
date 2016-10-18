@@ -1,6 +1,6 @@
-/*
-* This function runs the tests for the application files
-*/
+/**
+ * This function runs the tests for the application files
+ */
 (function () {
 
   //This is a mocked out files
@@ -54,16 +54,16 @@
         indexMap = InvertedIndex.getIndex('file1')['file1'];
         delete (indexMap._docSize);
 
-        /*This checks the docs associated with  all key indices in the indexMap
-         *and ensure that all docs contains a token (s) that is equal to the corresponding
-         *key they are mapped to.
+        /** 
+         * This checks the docs associated with  all key indices in the indexMap
+         * and ensure that all docs contains a token (s) that is equal to the corresponding
+         * key they are mapped to.
          */
         Object.keys(indexMap).forEach(function (key) { //search all indexed keys (tokens or words)
           Object.keys(indexMap[key]).forEach(function (docId) {//search all docs that maps to this key
             var doc = indexMap[key][docId].source;
 
-            //Merge the contents of the doc to one long string and create an
-            //array of tokenized terms
+            //Merge the contents of the doc to one long string and create an array of tokenized terms
             var mergedContentTokens = (doc.title + ' ' + doc.text).split(' ').map(function (token) {
               return InvertedIndex._tokenize(token);
             });
@@ -124,7 +124,7 @@
       it('verifies that searching the index returns correct values', function () {
         var results = InvertedIndex.searchIndex(query, 'file1');
         var mergedContentTokens;
-        //
+      
         query.split(' ').forEach(function (word) {
           word = InvertedIndex._tokenize(word);
 
@@ -161,7 +161,7 @@
 
         expect(stopTime - startTime < MAX_TIME).toBeTruthy();
 
-      });//
+      });
 
       it('Ensure searchIndex can handle an array of search terms', function () {
         var result = InvertedIndex.searchIndex(query.split(' '), 'file1');

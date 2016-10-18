@@ -1,4 +1,4 @@
-/*
+/**
  * Implementation of the Inverted index API
  */
 (function () {
@@ -16,12 +16,10 @@
     ensure(window, 'InvertedIndex', function () {
         //Instance variable to hold the indices.
         var indexMap = {};
-
-        //
         var TITLE_SCORE = 2;
         var TEXT_SCORE = 1;
 
-        /*
+        /**
          * This method takes in a word with whitespaces, non-alphanumric characters and
          * Returns a clean version with all unecessary characters striped away
          * And may sometimes further break token down into smaller parts
@@ -29,13 +27,14 @@
          * @param {string} dirtyToken
          * @return {string} clean token
          */
+         
         function _tokenize(dirtyToken) {
             //Converts the dirtyToken into a normalized form
             return dirtyToken.trim().replace(/[^a-z0-9]+/gi, '').toLowerCase();
         }
 
 
-        /*
+        /**
          * This function takes in a fileObject and generates an inverted index for it
          *
          * @param {object} fileObj
@@ -80,10 +79,8 @@
                 } else {
                     message.text = 'File does not contain any indexable docs';
                 }
-
             }
 
-            //
             return message;
         }
 
@@ -120,7 +117,7 @@
             });
         }
 
-        /*
+        /**
          * This method returns the inverted index corresponding to the fileName
          * If a filename is not provided, it returns all the indeces
          *
@@ -137,7 +134,7 @@
             return indexMap;
         }
 
-        /*
+        /**
          * This mwthods searches through the inverted index for docs that matches the query
          * 
          * @param {string / array} query
@@ -162,7 +159,6 @@
                 return message;
             }
 
-            //
             rawTokens.forEach(function (token) {
                 token = _tokenize(token);
                 if (usedTokens.indexOf(token) < 0) {
@@ -176,7 +172,8 @@
                                 var existsInResult = resultExists(doc, searchResults);
                                 if (existsInResult < 0) {
                                     searchResults.push(doc);
-                                } else { //update the score for that particular document
+                                } else { 
+                                    //update the score for that particular document
                                     searchResults[existsInResult].score += doc.score;
                                 }
                             });
@@ -193,12 +190,12 @@
             return message;
         };
 
-        /*
-        * This methods prevents search results from having duplicates
-        * 
-        * @param {array} results
-        * @return {object} doc
-        */
+        /**
+         * This methods prevents search results from having duplicates
+         * 
+         * @param {array} results
+         * @return {object} doc
+         */
         function resultExists(results, doc) {
             var docIndexInResult = -1;
             for (var i = 0; i < results.length; i++) {
@@ -216,6 +213,5 @@
             searchIndex: searchIndex,
             _tokenize: _tokenize
         };
-
     });
 } ());
