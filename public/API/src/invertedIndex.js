@@ -20,6 +20,8 @@
         var TEXT_SCORE = 1;
 
         /**
+         * _tokenize
+         * 
          * This method takes in a word with whitespaces, non-alphanumric characters and
          * Returns a clean version with all unecessary characters striped away
          * And may sometimes further break token down into smaller parts
@@ -35,6 +37,8 @@
 
 
         /**
+         * createIndex
+         * 
          * This function takes in a fileObject and generates an inverted index for it
          *
          * @param {object} fileObj
@@ -85,15 +89,17 @@
         }
 
         /** 
-        * This methods takes a document and adds its inverted index to the indexMap
-        *
-        * @param {string} fileName
-        * @param {array} tokens
-        * @param {number} score
-        * @param {object} doc
-        * @param {number} id
-        * 
-        */
+         * indexer
+         * 
+         * This methods takes a document and adds its inverted index to the indexMap
+         *
+         * @param {string} fileName
+         * @param {array} tokens
+         * @param {number} score
+         * @param {object} doc
+         * @param {number} id
+         * 
+         */
         function indexer(fileName, tokens, score, doc, id) {
 
             tokens.forEach(function (token) {
@@ -118,6 +124,8 @@
         }
 
         /**
+         * getIndex
+         * 
          * This method returns the inverted index corresponding to the fileName
          * If a filename is not provided, it returns all the indeces
          *
@@ -135,7 +143,9 @@
         }
 
         /**
-         * This mwthods searches through the inverted index for docs that matches the query
+         * searchIndex
+         * 
+         * This methods searches through the inverted index for docs that matches the query
          * 
          * @param {string / array} query
          * @return {array} searchResults
@@ -191,6 +201,8 @@
         };
 
         /**
+         * resultExists
+         * 
          * This methods prevents search results from having duplicates
          * 
          * @param {array} results
